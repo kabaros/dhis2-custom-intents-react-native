@@ -1,0 +1,9 @@
+# Build output and native dependencies
+android/**/build/
+android/.gradle/
+android/.kotlin/
+ios/Pods/
+ios/build/
+vendor/
+coverage/
+android/app/.cxx/

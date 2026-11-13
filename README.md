@@ -11,6 +11,46 @@ value to the Capture app field.
 | Application id              | `org.dhis2.intentdemo`                 |
 | Returned extras             | `VALUE` (String), `VALUE_JSON` (JSON Object, property `value`), `VALUE_LIST` (List of JSON Objects, property `value`) |
 
+## Run it
+
+You need Node 20+, JDK 17, and the Android SDK with `platform-tools` on your `PATH`.
+
+```bash
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
+
+npm install
+npm start               # terminal 1: Metro bundler
+npm run android         # terminal 2: build, install and launch on the emulator or device
+```
+
+Install the DHIS2 Capture app on the **same** emulator or device, from the Play
+Store or by running the capture-app repo (`./gradlew installDhis2Debug`).
+
+### Test without DHIS2
+
+```bash
+adb shell am start -a org.dhis2.intentdemo.CAPTURE --es GREETING "hello"
+```
+
+This shows the capture screen with `GREETING`. Pressing *Send* closes it; with
+`am start` there is no caller to receive the result.
+
+## Configure it in DHIS2
+
+In the **Android Settings** web app, open **Custom Intents → Add Custom Intent**:
+
+| Field | Value |
+|-------|-------|
+| Element Type | Tracked Entity Attribute (or Data Element) |
+| Attribute / Data Element | any **TEXT** or **LONG_TEXT** one |
+| Screen/Action | `DATA_ENTRY` (and/or `SEARCH`) |
+| Package Name | `org.dhis2.intentdemo.CAPTURE` |
+| Request parameter (optional) | key `ORG_UNIT`, value `VAR{orgunit_id}`; key `GREETING`, value `'hello'` (strings need single quotes) |
+| Response | Extra Name `VALUE`, Extra Type `String`, Property empty |
+
+Save, then sync the configuration in the Capture app.
+
 ## How it works
 
 The Capture app does `Intent(<Package Name>)` with your request parameters as
@@ -84,43 +124,3 @@ npx tsc --noEmit
 npx eslint .
 (cd android && ./gradlew assembleDebug)   # also runs codegen for NativeCustomIntentSpec
 ```
-
-## Run it
-
-You need Node 20+, JDK 17, and the Android SDK with `platform-tools` on your `PATH`.
-
-```bash
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
-
-npm install
-npm start               # terminal 1: Metro bundler
-npm run android         # terminal 2: build, install and launch on the emulator or device
-```
-
-Install the DHIS2 Capture app on the **same** emulator or device, from the Play
-Store or by running the capture-app repo (`./gradlew installDhis2Debug`).
-
-### Test without DHIS2
-
-```bash
-adb shell am start -a org.dhis2.intentdemo.CAPTURE --es GREETING "hello"
-```
-
-This shows the capture screen with `GREETING`. Pressing *Send* closes it; with
-`am start` there is no caller to receive the result.
-
-## Configure it in DHIS2
-
-In the **Android Settings** web app, open **Custom Intents → Add Custom Intent**:
-
-| Field | Value |
-|-------|-------|
-| Element Type | Tracked Entity Attribute (or Data Element) |
-| Attribute / Data Element | any **TEXT** or **LONG_TEXT** one |
-| Screen/Action | `DATA_ENTRY` (and/or `SEARCH`) |
-| Package Name | `org.dhis2.intentdemo.CAPTURE` |
-| Request parameter (optional) | key `ORG_UNIT`, value `VAR{orgunit_id}`; key `GREETING`, value `'hello'` (strings need single quotes) |
-| Response | Extra Name `VALUE`, Extra Type `String`, Property empty |
-
-Save, then sync the configuration in the Capture app.
