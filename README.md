@@ -51,6 +51,55 @@ In the **Android Settings** web app, open **Custom Intents → Add Custom Intent
 
 Save, then sync the configuration in the Capture app.
 
+### Example: Child Programme on DHIS2 play
+
+These steps make the **First name** field in the Child Programme open this app.
+The labels match the Android Settings web app 2.5.2, which is installed on play.
+
+| What      | Value                                       |
+| --------- | ------------------------------------------- |
+| Server    | `https://play.im.dhis2.org/stable-2-43-2-1` |
+| Login     | `admin` / `district`                        |
+| Program   | Child Programme (`IpHINAT79UW`)             |
+| Attribute | First name (`w75KJ2mc4zz`), value type TEXT |
+| Org unit  | Ngelehun CHC (`DiszpKrYNg8`)                |
+
+1. Log in to the server in a browser and open the **Android Settings** app. If
+   it shows **First time setup**, choose **Set defaults and save**.
+2. Go to **Custom Intents** and press **Add intent**. On the **Identifiers** tab:
+
+    | Field         | Value                          |
+    | ------------- | ------------------------------ |
+    | Intent name   | `Child first name (RN demo)`   |
+    | Element type  | Tracked entity attribute       |
+    | Attribute     | First name                     |
+    | Screen/Action | Data Entry                     |
+    | Package name  | `org.dhis2.intentdemo.CAPTURE` |
+
+3. Optional: on the **Request** tab, press **Add parameter** for each row. The
+   app shows every extra it receives.
+
+    | Key          | Value                |
+    | ------------ | -------------------- |
+    | `orgunit_id` | `VAR{orgunit_id}`    |
+    | `username`   | `VAR{user_username}` |
+    | `source`     | `'child-programme'`  |
+
+    Fixed text needs single quotes. Variables need curly braces:
+    `VAR(orgunit_id)` does not parse.
+
+4. On the **Response** tab, set **Extra name** `VALUE` and **Extra type**
+   String. Press **Save Intent**, then **Save** at the bottom of the Custom
+   Intents page.
+5. In the DHIS2 Capture app on the device, log in to the same server as
+   `admin` / `district`, then sync the configuration (or log out and back in).
+6. Open Child Programme in Ngelehun CHC and enroll a child (or open an existing
+   one). Tap **First name**: Android opens this app. Type a name and press
+   **Send to DHIS2**.
+
+The intent is attached to the attribute, not the program, so it also appears
+wherever First name is used in other programs.
+
 ## How it works
 
 The Capture app does `Intent(<Package Name>)` with your request parameters as

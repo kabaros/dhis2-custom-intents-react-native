@@ -39,12 +39,6 @@ export default function CaptureScreen() {
             <SafeAreaView style={styles.container}>
                 <ScrollView contentContainerStyle={styles.content}>
                     <Text style={styles.title}>Custom intent received</Text>
-                    <Text style={styles.label}>Intent payload</Text>
-                    <ScrollView horizontal style={styles.json}>
-                        <Text style={styles.mono} selectable>
-                            {JSON.stringify(launchInfo, null, 2)}
-                        </Text>
-                    </ScrollView>
 
                     <Text style={styles.label}>Value to return</Text>
                     <TextInput
@@ -62,6 +56,13 @@ export default function CaptureScreen() {
                         />
                         <Button title="Cancel" onPress={cancel} color="#888" />
                     </View>
+
+                    <Text style={styles.label}>Intent payload</Text>
+                    <ScrollView horizontal style={styles.json}>
+                        <Text style={styles.mono} selectable>
+                            {JSON.stringify(launchInfo, null, 2)}
+                        </Text>
+                    </ScrollView>
 
                     <View style={styles.divider} />
                     <SetupInstructions />

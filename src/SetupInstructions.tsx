@@ -1,87 +1,109 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
+/**
+ * Step-by-step setup for the DHIS2 play demo: a custom intent on the
+ * "First name" attribute of the Child Programme. Labels match the Android
+ * Settings web app 2.5.2 (installed on play).
+ */
+const SERVER = 'https://play.im.dhis2.org/stable-2-43-2-1'
 const ACTION = 'org.dhis2.intentdemo.CAPTURE'
 
-const RESPONSES = [
-    { name: 'VALUE', type: 'String', property: '(leave empty)' },
-    { name: 'VALUE_JSON', type: 'JSON Object', property: 'value' },
-    { name: 'VALUE_LIST', type: 'List of JSON Objects', property: 'value' },
-]
-
-const REQUEST_EXAMPLES = [
-    { key: 'orgunit_id', value: 'VAR{orgunit_id}' },
-    { key: 'username', value: 'VAR{user_username}' },
-    { key: 'mode', value: "'demo'" },
-]
-
-/**
- * How to configure the custom intent in the Android Settings web app.
- * Shown on the launcher screen and under the intent screen.
- */
 export default function SetupInstructions() {
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Setting up the custom intent</Text>
+            <Text style={styles.heading}>
+                Set it up on DHIS2 play: Child Programme, First name
+            </Text>
             <Text style={styles.body}>
-                The DHIS2 Capture app opens this app from a form field, and the
-                value you enter is sent back into that field. Set it up in the
-                Android Settings web app on your DHIS2 server:
+                These steps make the First name field in the Child Programme
+                open this app. The value you send back fills that field.
             </Text>
 
-            <Step n={1} title="Add a custom intent">
+            <Table
+                rows={[
+                    ['Server', SERVER],
+                    ['Login', 'admin / district'],
+                    ['Program', 'Child Programme (IpHINAT79UW)'],
+                    ['Attribute', 'First name (w75KJ2mc4zz), TEXT'],
+                    ['Org unit', 'Ngelehun CHC (DiszpKrYNg8)'],
+                ]}
+            />
+
+            <Step n={1} title="Open the Android Settings app">
                 <Text style={styles.body}>
-                    Open the Android Settings web app, go to Custom Intents, and
-                    add a new one. Give it a name, and choose the data elements
-                    or attributes it applies to (the trigger). Use a text value
-                    type for those fields.
+                    Log in to the server above in a browser and open the Android
+                    Settings app. If it asks for a First time setup, choose “Set
+                    defaults and save”.
                 </Text>
             </Step>
 
-            <Step n={2} title="Package name">
+            <Step n={2} title="Add the intent">
                 <Text style={styles.body}>
-                    Must match this app’s intent action:
-                </Text>
-                <Text style={styles.code} selectable>
-                    {ACTION}
-                </Text>
-            </Step>
-
-            <Step n={3} title="Response">
-                <Text style={styles.body}>
-                    Add one of these extras. They are different shapes of the
-                    same value, so pick one to try:
+                    Go to Custom Intents and press “Add intent”. On the
+                    Identifiers tab:
                 </Text>
                 <Table
-                    headers={['Extra name', 'Extra type', 'Property']}
-                    rows={RESPONSES.map((r) => [r.name, r.type, r.property])}
+                    rows={[
+                        ['Intent name', 'Child first name (RN demo)'],
+                        ['Element type', 'Tracked entity attribute'],
+                        ['Attribute', 'First name'],
+                        ['Screen/Action', 'Data Entry'],
+                        ['Package name', ACTION],
+                    ]}
                 />
             </Step>
 
-            <Step n={4} title="Request arguments (optional)">
+            <Step n={3} title="Request (optional)">
                 <Text style={styles.body}>
-                    Keys become intent extras, and this app lists whatever it
-                    receives. Values are expressions: wrap fixed text in single
-                    quotes, and use VAR
-                    {'{…}'} for context variables (orgunit_id, orgunit_code,
-                    orgunit_path, user_id, user_username).
+                    On the Request tab, press “Add parameter” for each row. This
+                    app shows whatever it receives.
                 </Text>
                 <Table
                     headers={['Key', 'Value']}
-                    rows={REQUEST_EXAMPLES.map((r) => [r.key, r.value])}
+                    rows={[
+                        ['orgunit_id', 'VAR{orgunit_id}'],
+                        ['username', 'VAR{user_username}'],
+                        ['source', "'child-programme'"],
+                    ]}
                 />
                 <Text style={styles.note}>
-                    Use curly braces: VAR(orgunit_id) with parentheses does not
-                    parse.
+                    Fixed text needs single quotes. Variables need curly braces:
+                    VAR(orgunit_id) does not work.
                 </Text>
             </Step>
 
-            <Step n={5} title="Sync and try it">
+            <Step n={4} title="Response">
+                <Text style={styles.body}>On the Response tab:</Text>
+                <Table
+                    rows={[
+                        ['Extra name', 'VALUE'],
+                        ['Extra type', 'String'],
+                    ]}
+                />
                 <Text style={styles.body}>
-                    Save, then sync the configuration in the Capture app (or log
-                    out and back in). Open a form with the configured field and
-                    tap it: Android opens this app, and “Send to DHIS2” fills
-                    the field.
+                    Press “Save Intent”, then “Save” at the bottom of the Custom
+                    Intents page.
+                </Text>
+            </Step>
+
+            <Step n={5} title="Sync the Capture app">
+                <Text style={styles.body}>
+                    In the DHIS2 Capture app on this device, log in to the same
+                    server (admin / district), then sync the configuration, or
+                    log out and back in.
+                </Text>
+            </Step>
+
+            <Step n={6} title="Try it">
+                <Text style={styles.body}>
+                    Open Child Programme in Ngelehun CHC and enroll a new child
+                    (or open an existing one). Tap the First name field: Android
+                    opens this app. Type a name and press “Send to DHIS2”.
+                </Text>
+                <Text style={styles.note}>
+                    The intent is attached to the attribute, so it also appears
+                    wherever First name is used in other programs.
                 </Text>
             </Step>
         </View>
@@ -110,25 +132,43 @@ function Step({
     )
 }
 
-function Table({ headers, rows }: { headers: string[]; rows: string[][] }) {
+/** Without headers, the first column is styled as row labels. */
+function Table({ headers, rows }: { headers?: string[]; rows: string[][] }) {
+    const all = headers ? [headers, ...rows] : rows
     return (
         <View style={styles.table}>
-            {[headers, ...rows].map((row, i) => (
-                <View key={i} style={[styles.row, i === 0 && styles.headerRow]}>
-                    {row.map((cell, j) => (
-                        <Text
-                            key={j}
-                            selectable
-                            style={[
-                                styles.cell,
-                                i === 0 ? styles.headerCell : styles.mono,
-                            ]}
-                        >
-                            {cell}
-                        </Text>
-                    ))}
-                </View>
-            ))}
+            {all.map((row, i) => {
+                const isHeader = !!headers && i === 0
+                return (
+                    <View
+                        key={i}
+                        style={[
+                            styles.row,
+                            i === 0 && styles.firstRow,
+                            isHeader && styles.headerRow,
+                        ]}
+                    >
+                        {row.map((cell, j) => {
+                            const isLabel = !headers && j === 0
+                            return (
+                                <Text
+                                    key={j}
+                                    selectable
+                                    style={[
+                                        styles.cell,
+                                        isHeader || isLabel
+                                            ? styles.labelCell
+                                            : styles.mono,
+                                        isLabel && styles.labelColumn,
+                                    ]}
+                                >
+                                    {cell}
+                                </Text>
+                            )
+                        })}
+                    </View>
+                )
+            })}
         </View>
     )
 }
@@ -150,17 +190,16 @@ const styles = StyleSheet.create({
     badgeText: { color: '#fff', fontWeight: '600', fontSize: 13 },
     stepBody: { flex: 1, gap: 6 },
     stepTitle: { fontSize: 16, fontWeight: '600', color: '#000' },
-    code: {
-        fontFamily: 'monospace',
-        color: '#000',
-        backgroundColor: '#f3f5f7',
-        padding: 8,
-        borderRadius: 3,
-    },
     table: { borderWidth: 1, borderColor: '#e8edf2', borderRadius: 3 },
-    row: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#e8edf2' },
-    headerRow: { borderTopWidth: 0, backgroundColor: '#f8f9fa' },
+    row: {
+        flexDirection: 'row',
+        borderTopWidth: 1,
+        borderTopColor: '#e8edf2',
+    },
+    firstRow: { borderTopWidth: 0 },
+    headerRow: { backgroundColor: '#f8f9fa' },
     cell: { flex: 1, padding: 6, fontSize: 12 },
-    headerCell: { fontWeight: '600', color: '#404b5a' },
+    labelColumn: { flex: 0.5, backgroundColor: '#f8f9fa' },
+    labelCell: { fontWeight: '600', color: '#404b5a' },
     mono: { fontFamily: 'monospace', color: '#212934' },
 })
