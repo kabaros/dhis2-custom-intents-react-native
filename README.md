@@ -5,11 +5,11 @@ through a [custom intent](https://docs.dhis2.org/en/use/android-app/android-web-
 It shows the request extras it received, lets you type a value, and returns that
 value to the Capture app field.
 
-| Thing                       | Value                                  |
-|-----------------------------|----------------------------------------|
-| Intent action ("Package Name" in the Android Settings web app) | `org.dhis2.intentdemo.CAPTURE` |
-| Application id              | `org.dhis2.intentdemo`                 |
-| Returned extras             | `VALUE` (String), `VALUE_JSON` (JSON Object, property `value`), `VALUE_LIST` (List of JSON Objects, property `value`) |
+| Thing                                                          | Value                                                                                                                 |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Intent action ("Package Name" in the Android Settings web app) | `org.dhis2.intentdemo.CAPTURE`                                                                                        |
+| Application id                                                 | `org.dhis2.intentdemo`                                                                                                |
+| Returned extras                                                | `VALUE` (String), `VALUE_JSON` (JSON Object, property `value`), `VALUE_LIST` (List of JSON Objects, property `value`) |
 
 ## Run it
 
@@ -33,21 +33,21 @@ Store or by running the capture-app repo (`./gradlew installDhis2Debug`).
 adb shell am start -a org.dhis2.intentdemo.CAPTURE --es GREETING "hello"
 ```
 
-This shows the capture screen with `GREETING`. Pressing *Send* closes it; with
+This shows the capture screen with `GREETING`. Pressing _Send_ closes it; with
 `am start` there is no caller to receive the result.
 
 ## Configure it in DHIS2
 
 In the **Android Settings** web app, open **Custom Intents → Add Custom Intent**:
 
-| Field | Value |
-|-------|-------|
-| Element Type | Tracked Entity Attribute (or Data Element) |
-| Attribute / Data Element | any **TEXT** or **LONG_TEXT** one |
-| Screen/Action | `DATA_ENTRY` (and/or `SEARCH`) |
-| Package Name | `org.dhis2.intentdemo.CAPTURE` |
+| Field                        | Value                                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Element Type                 | Tracked Entity Attribute (or Data Element)                                                            |
+| Attribute / Data Element     | any **TEXT** or **LONG_TEXT** one                                                                     |
+| Screen/Action                | `DATA_ENTRY` (and/or `SEARCH`)                                                                        |
+| Package Name                 | `org.dhis2.intentdemo.CAPTURE`                                                                        |
 | Request parameter (optional) | key `ORG_UNIT`, value `VAR{orgunit_id}`; key `GREETING`, value `'hello'` (strings need single quotes) |
-| Response | Extra Name `VALUE`, Extra Type `String`, Property empty |
+| Response                     | Extra Name `VALUE`, Extra Type `String`, Property empty                                               |
 
 Save, then sync the configuration in the Capture app.
 
@@ -66,16 +66,16 @@ Capture app ──Intent(action=org.dhis2.intentdemo.CAPTURE, extras)──▶ C
 Capture app ◀──setResult(RESULT_OK, extras: VALUE, VALUE_JSON, ...)── CustomIntent.sendResult()
 ```
 
-| File | Purpose |
-|------|---------|
-| `android/app/src/main/AndroidManifest.xml` | `CaptureActivity` with the intent-filter for the action |
-| `android/app/src/main/java/org/dhis2/intentdemo/CaptureActivity.kt` | ReactActivity that renders the `CaptureIntent` component |
-| `android/app/src/main/java/org/dhis2/intentdemo/customintent/CustomIntentModule.kt` | Turbo Native Module: reads the extras, calls `setResult` and `finish` |
-| `android/app/src/main/java/org/dhis2/intentdemo/customintent/CustomIntentPackage.kt` | Registers the module (added in `MainApplication.kt`) |
-| `specs/NativeCustomIntent.ts` | Codegen spec for the module |
-| `src/customIntent.ts` | Typed JS wrapper: `getLaunchInfo()`, `sendResult()`, `cancel()` |
-| `src/CaptureScreen.tsx` | UI shown when the Capture app opens the intent |
-| `index.js` | Registers `Dhis2IntentApp` (launcher) and `CaptureIntent` (intent) |
+| File                                                                                 | Purpose                                                               |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `android/app/src/main/AndroidManifest.xml`                                           | `CaptureActivity` with the intent-filter for the action               |
+| `android/app/src/main/java/org/dhis2/intentdemo/CaptureActivity.kt`                  | ReactActivity that renders the `CaptureIntent` component              |
+| `android/app/src/main/java/org/dhis2/intentdemo/customintent/CustomIntentModule.kt`  | Turbo Native Module: reads the extras, calls `setResult` and `finish` |
+| `android/app/src/main/java/org/dhis2/intentdemo/customintent/CustomIntentPackage.kt` | Registers the module (added in `MainApplication.kt`)                  |
+| `specs/NativeCustomIntent.ts`                                                        | Codegen spec for the module                                           |
+| `src/customIntent.ts`                                                                | Typed JS wrapper: `getLaunchInfo()`, `sendResult()`, `cancel()`       |
+| `src/CaptureScreen.tsx`                                                              | UI shown when the Capture app opens the intent                        |
+| `index.js`                                                                           | Registers `Dhis2IntentApp` (launcher) and `CaptureIntent` (intent)    |
 
 To return numbers or booleans, use
 `sendResult({ COUNT: { type: 'int', value: 3 } })`. Supported types are
@@ -110,12 +110,12 @@ mkdir -p specs src android/app/src/main/java/org/dhis2/intentdemo/customintent
 ```
 
 4. Add or edit these files by hand (contents are in the repo):
-   - New: `specs/NativeCustomIntent.ts`, `src/customIntent.ts`, `src/CaptureScreen.tsx`,
-     `android/.../CaptureActivity.kt`, `android/.../customintent/CustomIntentModule.kt`,
-     `android/.../customintent/CustomIntentPackage.kt`
-   - Edited: `AndroidManifest.xml` (added `CaptureActivity` and its intent-filter),
-     `MainApplication.kt` (`add(CustomIntentPackage())`), `index.js` (registered
-     `CaptureIntent`), `App.tsx` (simple launcher screen), `README.md`
+    - New: `specs/NativeCustomIntent.ts`, `src/customIntent.ts`, `src/CaptureScreen.tsx`,
+      `android/.../CaptureActivity.kt`, `android/.../customintent/CustomIntentModule.kt`,
+      `android/.../customintent/CustomIntentPackage.kt`
+    - Edited: `AndroidManifest.xml` (added `CaptureActivity` and its intent-filter),
+      `MainApplication.kt` (`add(CustomIntentPackage())`), `index.js` (registered
+      `CaptureIntent`), `App.tsx` (simple launcher screen), `README.md`
 
 ```bash
 # 5. Point Gradle at the Android SDK, then verify

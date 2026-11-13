@@ -7,3 +7,8 @@ ios/build/
 vendor/
 coverage/
 android/app/.cxx/
+
+# Lockfiles are written by the package manager
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
